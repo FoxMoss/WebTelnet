@@ -1,0 +1,23 @@
+{
+  "name": "WebTelnet",
+  "author": "foxmoss",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mercuryworkshop/alicejs": "^1.1.3",
+    "express": "^4.18.2",
+    "vite": "^5.1.3",
+    "wisp-server-cpp": "^1.0.6"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  }
+}
