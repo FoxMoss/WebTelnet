@@ -3,6 +3,7 @@ import { WispStream, WispConnection } from "./wisp-client-js/wisp.js";
 
 let conn: WispConnection;
 let stream: WispStream;
+let setDisabled: (val: boolean) => void;
 
 function Message(args: { value: string }) {
   return <div class="message">{args.value}</div>;
@@ -20,6 +21,9 @@ function ServerOptions(args: {
         on:click={() => {
           args.setMessages([Message({ value: "... Start of stream ..." })]);
 
+          setDisabled(false);
+
+
           stream = conn.create_stream(
             (document.getElementById("domain") as HTMLInputElement).value,
             parseInt(
@@ -35,6 +39,7 @@ function ServerOptions(args: {
             args.setMessages(messages);
           });
           stream.addEventListener("close", (event: any) => {
+            setDisabled(true);
             let messages = args.getMessages();
             messages.push(<Message value="... End of stream ..."></Message>);
             args.setMessages(messages);
@@ -52,13 +57,31 @@ function Input(args: {
   setMessages: (arr: any) => void;
   getMessages: () => Array<any>;
 }) {
+  this.disabled = true;
+  setDisabled = (val) => {
+    this.disabled = val;
+    (document.getElementById("sendButton") as HTMLButtonElement).disabled = val
+  };
+
+
+  this.value = "GET / HTTP/1.1\n" +
+    "Host: foxmoss.com\n" +
+    "User-Agent: curl/7.81.0\n" +
+    "Accept: */*\n\n"
+    ;
   return (
     <div class="container">
-      <textarea id="userInput" class="input">
-        GET / HTTP/1.1
-      </textarea>
+      <textarea
+        id="userInput"
+        class="input"
+        bind:value={
+          use(this.value)
+        }
+      ></textarea>
       <button
         class="button"
+        id="sendButton"
+        disabled
         on:click={() => {
           let messages = args.getMessages();
           messages.push(
@@ -91,17 +114,17 @@ function Input(args: {
       >
         Send.
       </button>
-    </div>
+    </div >
   );
 }
 function App() {
   this.messages = [];
 
   let setMessages = (val: any[]) => {
-    this.messages = val;
+    this.messages = val.reverse();
   };
   let getMessages = () => {
-    return this.messages;
+    return this.messages.reverse();
   };
 
   return (
