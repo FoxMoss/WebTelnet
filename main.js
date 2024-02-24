@@ -1,21 +1,21 @@
-import { init, routeRequest, routeUpgrade, shouldRoute } from "wisp-server-cpp"
-import http from "node:http"
-import express from "express"
+import { init, routeRequest, routeUpgrade, shouldRoute } from "wisp-server-cpp";
+import http from "node:http";
+import express from "express";
 
 init();
 
 const app = express();
 const server = http.createServer();
 
-server.on('request', (request, response) => {
+server.on("request", (request, response) => {
   if (shouldRoute(request)) {
-    response.setHeader
+    response.setHeader;
     routeRequest(request, response);
     return;
   }
   app(request, response);
 });
-server.on('upgrade', (request, socket, head) => {
+server.on("upgrade", (request, socket, head) => {
   if (shouldRoute(request)) {
     routeUpgrade(request, socket, head);
     return;
@@ -24,5 +24,5 @@ server.on('upgrade', (request, socket, head) => {
 
 app.use(express.static("dist/"));
 
-server.listen(6001)
-console.log("Running on port 6001")
+server.listen(6001);
+console.log("Running on port 6001");
