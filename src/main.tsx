@@ -1,15 +1,29 @@
-import "@mercuryworkshop/alicejs";
-import { WispStream, WispConnection } from "./wisp-client-js/wisp.js";
+import "@mercuryworkshop/dreamlandjs";
+import { WispStream, WispConnection } from "wisp-client-js";
 
 let conn: WispConnection;
 let stream: WispStream;
 let setDisabled: (val: boolean) => void;
 
-function Message(args: { value: string }) {
-  return <div class="message">{args.value}</div>;
+const WebFormat = (text: string) => text.split("").map((val: string) => {
+  if (val === " ") {
+    return (<span>&nbsp;</span>);
+  }
+  if (val === "\n") {
+    return (<br />);
+  }
+  return val;
+});
+function Message(this: { value: string }) {
+  this;
+  return (
+    <div class="message">
+      {WebFormat(this.value)}
+    </div>
+  );
 }
 
-function ServerOptions(args: {
+function ServerOptions(this: {
   setMessages: (arr: any) => void;
   getMessages: () => Array<any>;
 }) {
@@ -19,10 +33,9 @@ function ServerOptions(args: {
       <input id="port" value="80" class="input"></input>
       <button
         on:click={() => {
-          args.setMessages([Message({ value: "... Start of stream ..." })]);
+          this.setMessages([<Message value="... Start of stream ..." />]);
 
           setDisabled(false);
-
 
           stream = conn.create_stream(
             (document.getElementById("domain") as HTMLInputElement).value,
@@ -32,17 +45,17 @@ function ServerOptions(args: {
           );
 
           stream.addEventListener("message", (event: any) => {
-            let messages = args.getMessages();
+            let messages = this.getMessages();
             messages.push(
               <Message value={new TextDecoder().decode(event.data)}></Message>,
             );
-            args.setMessages(messages);
+            this.setMessages(messages);
           });
           stream.addEventListener("close", (event: any) => {
             setDisabled(true);
-            let messages = args.getMessages();
+            let messages = this.getMessages();
             messages.push(<Message value="... End of stream ..."></Message>);
-            args.setMessages(messages);
+            this.setMessages(messages);
           });
         }}
         class="button"
@@ -53,37 +66,36 @@ function ServerOptions(args: {
   );
 }
 
-function Input(args: {
+function Input(this: {
   setMessages: (arr: any) => void;
   getMessages: () => Array<any>;
+  disabled: boolean;
+  value: string;
 }) {
   this.disabled = true;
   setDisabled = (val) => {
     this.disabled = val;
-    (document.getElementById("sendButton") as HTMLButtonElement).disabled = val
+    (document.getElementById("sendButton") as HTMLButtonElement).disabled = val;
   };
 
-
-  this.value = "GET / HTTP/1.1\n" +
+  this.value =
+    "GET / HTTP/1.1\n" +
     "Host: foxmoss.com\n" +
     "User-Agent: curl/7.81.0\n" +
-    "Accept: */*\n\n"
-    ;
+    "Accept: */*\n\n";
   return (
     <div class="container">
       <textarea
         id="userInput"
         class="input"
-        bind:value={
-          use(this.value)
-        }
+        bind:value={use(this.value)}
       ></textarea>
       <button
         class="button"
         id="sendButton"
         disabled
         on:click={() => {
-          let messages = args.getMessages();
+          let messages = this.getMessages();
           messages.push(
             <Message
               value={
@@ -92,7 +104,7 @@ function Input(args: {
               }
             ></Message>,
           );
-          args.setMessages(messages);
+          this.setMessages(messages);
 
           let outData = (
             document.getElementById("userInput") as HTMLTextAreaElement
@@ -114,7 +126,7 @@ function Input(args: {
       >
         Send.
       </button>
-    </div >
+    </div>
   );
 }
 function App() {

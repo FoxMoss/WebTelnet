@@ -20,7 +20,7 @@
     "jsxFactory": "h",
     "jsxFragmentFactory": "YOU_CANT_USE_FRAGMENTS",
     "types": [
-      "@mercuryworkshop/alicejs"
+      "@mercuryworkshop/dreamlandjs"
     ],
   }
 }
